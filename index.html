@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Quest Portfolio - 作品集入口網站</title>
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for futuristic Cyberpunk / Y2K typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+TC:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff007f;
+            --neon-purple: #7000ff;
+            --neon-yellow: #ffe600;
+            --bg-dark: #0a0a12;
+            --card-glass: rgba(16, 18, 27, 0.65);
+        }
+
+        body {
+            font-family: 'Orbitron', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Cyberpunk Grid Background */
+        .cyber-bg {
+            background-image: 
+                linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 0, 127, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: bgMove 20s linear infinite;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* Glassmorphism Effect */
+        .glass-panel {
+            background: var(--card-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* Glowing Avatar Frame */
+        .avatar-frame {
+            position: relative;
+            border-radius: 50%;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.6), 0 0 40px rgba(255, 0, 127, 0.4);
+            animation: pulseGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(0, 240, 255, 0.5), 0 0 30px rgba(255, 0, 127, 0.3); }
+            100% { box-shadow: 0 0 25px rgba(0, 240, 255, 0.9), 0 0 50px rgba(255, 0, 127, 0.7); }
+        }
+
+        /* Glitch Animation Effect */
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* Unlocked Card Hover Animations */
+        .quest-card-unlocked {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(16, 24, 40, 0.8), rgba(10, 10, 18, 0.9));
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        .quest-card-unlocked:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5), inset 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+
+        .quest-card-unlocked::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .quest-card-unlocked:hover::before {
+            left: 100%;
+        }
+
+        /* Locked Card Styling */
+        .quest-card-locked {
+            background: rgba(18, 18, 26, 0.4);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            cursor: not-allowed;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .quest-card-locked:hover {
+            opacity: 0.85;
+            border-color: rgba(255, 0, 127, 0.4);
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.2);
+            animation: lockedShake 0.4s ease-in-out;
+        }
+
+        @keyframes lockedShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-4px); }
+            40% { transform: translateX(4px); }
+            60% { transform: translateX(-2px); }
+            80% { transform: translateX(2px); }
+        }
+
+        /* Scanline Overlay */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="cyber-bg relative flex flex-col items-center justify-between p-4 sm:p-8 min-h-screen">
+
+    <!-- Scanline Visual Overlay -->
+    <div class="scanline"></div>
+
+    <!-- Background Light Blobs -->
+    <div class="fixed top-1/4 left-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="fixed bottom-1/4 right-10 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="w-full max-w-6xl mx-auto z-10 flex flex-col items-center">
+        
+        <!-- HEADER / PROFILE SECTION -->
+        <header class="w-full text-center my-6 sm:my-10 flex flex-col items-center">
+            
+            <!-- Avatar Frame -->
+            <div class="avatar-frame mb-4 w-28 h-28 sm:w-36 sm:h-36">
+                <img 
+                    src="https://placehold.co/150x150/0f172a/00f0ff?text=AVATAR" 
+                    alt="Player Avatar" 
+                    class="w-full h-full object-cover rounded-full border-2 border-slate-900"
+                    onerror="this.src='https://placehold.co/150x150/0f172a/00f0ff?text=AVATAR'"
+                >
+            </div>
+
+            <!-- Player Name & Cyber Tag -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-400 text-xs font-semibold mb-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                PLAYER 01 // PORTFOLIO SYSTEM
+            </div>
+
+            <h1 class="glitch-text text-3xl sm:text-5xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-pink-500 to-yellow-400 uppercase">
+                創作者作品集
+            </h1>
+            
+            <p class="text-slate-400 text-xs sm:text-sm mt-2 max-w-md tracking-widest uppercase">
+                網頁程式設計課程闖關地圖 · Level Progress: <span class="text-cyan-400 font-bold">2 / 16</span>
+            </p>
+
+            <!-- Progress Bar Container -->
+            <div class="w-64 sm:w-80 h-2 bg-slate-800 rounded-full mt-4 overflow-hidden border border-slate-700/50 p-0.5">
+                <div class="h-full bg-gradient-to-r from-cyan-500 to-pink-500 rounded-full w-[12.5%] shadow-[0_0_10px_#00f0ff]"></div>
+            </div>
+        </header>
+
+        <!-- QUEST MAP GRID (16 BUTTONS) -->
+        <main class="w-full my-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+                
+                <!-- Week 1 (UNLOCKED) -->
+                <a href="w1/index.html" class="quest-card-unlocked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40 group">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                            STAGE 01
+                        </span>
+                        <i class="fa-solid fa-unlock text-cyan-400 text-sm group-hover:scale-125 transition-transform"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
+                            Week 1 - 數位名片
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                            <i class="fa-solid fa-play text-[9px] text-cyan-400"></i> 點擊進入關卡
+                        </p>
+                    </div>
+                    <div class="w-full bg-cyan-500/10 h-1 rounded-full overflow-hidden">
+                        <div class="bg-cyan-400 h-full w-full"></div>
+                    </div>
+                </a>
+
+                <!-- Week 2 (UNLOCKED) -->
+                <a href="w2/index.html" class="quest-card-unlocked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40 group">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                            STAGE 02
+                        </span>
+                        <i class="fa-solid fa-unlock text-cyan-400 text-sm group-hover:scale-125 transition-transform"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
+                            Week 2 - 今天吃什麼？
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                            <i class="fa-solid fa-play text-[9px] text-cyan-400"></i> 點擊進入關卡
+                        </p>
+                    </div>
+                    <div class="w-full bg-cyan-500/10 h-1 rounded-full overflow-hidden">
+                        <div class="bg-cyan-400 h-full w-full"></div>
+                    </div>
+                </a>
+
+                <!-- Week 3 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 03
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 3 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 4 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 04
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 4 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 5 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 05
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 5 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 6 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 06
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 6 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 7 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 07
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 7 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 8 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 08
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 8 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 9 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 09
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 9 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 10 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 10
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 10 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 11 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 11
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 11 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 12 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 12
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 12 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 13 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 13
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 13 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 14 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 14
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 14 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 15 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 15
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 15 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+                <!-- Week 16 (LOCKED) -->
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                            STAGE 16
+                        </span>
+                        <span class="text-sm">🔒</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
+                            Week 16 - 未解鎖
+                        </h3>
+                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- FOOTER SECTION -->
+        <footer class="w-full text-center py-6 mt-8 text-xs text-slate-500 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+                © 2026 Web Design Course Portfolio. All rights reserved.
+            </div>
+            <div class="flex items-center gap-4 text-slate-400">
+                <span class="hover:text-cyan-400 cursor-pointer transition-colors"><i class="fa-brands fa-github"></i> GitHub</span>
+                <span class="hover:text-pink-400 cursor-pointer transition-colors"><i class="fa-solid fa-code"></i> HTML5/CSS3</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Interactive Toast Message for Locked Items -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 text-pink-400 border border-pink-500/50 px-4 py-2 rounded-lg text-xs tracking-wide shadow-lg shadow-pink-500/10 pointer-events-none opacity-0 transition-opacity duration-300 z-50 flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation"></i> 該關卡尚未開放解鎖！請完成前面的作業任務。
+    </div>
+
+  <script>
+        // Attach click listeners to locked cards for feedback animation
+        document.querySelectorAll('.quest-card-locked').forEach(card => {
+            card.addEventListener('click', () => {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('opacity-0');
+                toast.classList.add('opacity-100');
+                
+                setTimeout(() => {
+                    toast.classList.remove('opacity-100');
+                    toast.classList.add('opacity-0');
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
