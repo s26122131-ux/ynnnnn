@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>咖波卡哇伊迷因產生器 Capoo Meme Generator</title>
+    
+    <!-- 引入 Google Fonts：Fredoka (可愛英文字) 與 ZCOOL KuaiLe (圓滾滾字體) 及 Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@500;700;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    
+    <!-- 引入 html2canvas 畫布截圖庫 (匯出圖片必備) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- 引入 FontAwesome 圖示庫庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ==========================================
+           咖波主題全域樣式 (CSS Variables)
+           ========================================== */
+        :root {
+            --capoo-blue: #2cb5e8;        /* 咖波經典水藍 */
+            --capoo-blue-dark: #1994c2;   /* 深水藍 (懸停/邊框) */
+            --capoo-blue-light: #e6f7ff;  /* 淺水藍背景 */
+            --capoo-yellow: #ffcf25;      /* 咖波小雞黃 */
+            --capoo-pink: #ff85a2;        /* 肉肉粉色 */
+            --capoo-dark: #2c3e50;        /* 塗鴉黑字 */
+            --capoo-bg: #f0f8ff;          /* 頁面大背景 (雲朵白) */
+            --card-bg: #ffffff;           /* 卡片白色背景 */
+            --border-radius: 24px;        /* 咖波招牌大圓角 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+        }
+
+        body {
+            background-color: var(--capoo-bg);
+            color: var(--capoo-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 15px;
+            /* 可愛點點背景圖案 */
+            background-image: radial-gradient(var(--capoo-blue) 1px, transparent 1px);
+            background-size: 24px 24px;
+            background-color: #f4fbff;
+        }
+
+        /* 標題區塊 */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: var(--capoo-blue-dark);
+            font-weight: 900;
+            text-shadow: 2px 2px 0px #fff, 4px 4px 0px var(--capoo-blue-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header p {
+            color: #6688a0;
+            font-size: 1rem;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* 主主體容器 (雙欄響應式配置) */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* 控制面板卡片 & 預覽區卡片 */
+        .panel-card, .preview-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(44, 181, 232, 0.15);
+            border: 4px solid var(--capoo-blue-light);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            position: relative;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--capoo-blue-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 3px dashed var(--capoo-blue-light);
+            padding-bottom: 10px;
+        }
+
+        /* 輸入與控制元件樣式 */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #4a6572;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider-value {
+            background: var(--capoo-blue-light);
+            color: var(--capoo-blue-dark);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* 文字輸入框 */
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 3px solid #e0f2fe;
+            border-radius: 16px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+            background: #fafdfe;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--capoo-blue);
+            box-shadow: 0 0 0 4px rgba(44, 181, 232, 0.2);
+            background: #fff;
+        }
+
+        /* 上傳圖片拖拽區 */
+        .upload-area {
+            border: 3px dashed var(--capoo-blue);
+            background: var(--capoo-blue-light);
+            border-radius: 18px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            background: #d0f0ff;
+            transform: scale(1.01);
+        }
+
+        .upload-area i {
+            font-size: 2.2rem;
+            color: var(--capoo-blue-dark);
+            margin-bottom: 6px;
+        }
+
+        .upload-area p {
+            font-size: 0.9rem;
+            color: #3b7b99;
+            font-weight: 600;
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* 滑桿可愛樣式 */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #e0f2fe;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--capoo-blue);
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.1s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: var(--capoo-blue-dark);
+        }
+
+        /* 顏色選擇器與控制列 */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px var(--capoo-blue);
+        }
+
+        /* ==========================================
+           右側迷因即時預覽區樣式
+           ========================================== */
+        .preview-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #111;
+            border-radius: 18px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            min-height: 320px;
+        }
+
+        /* 包含圖片與雙層文字的核心容器 (轉換截圖目標) */
+        #meme-stage {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            user-select: none;
+        }
+
+        #meme-image {
+            width: 100%;
+            max-height: 520px;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* 迷因文字共通樣式 (帶黑色重輪廓 stroke / text-shadow) */
+        .meme-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            text-align: center;
+            font-family: 'ZCOOL KuaiLe', 'Impact', 'Fredoka', sans-serif;
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1.2;
+            word-break: break-word;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            pointer-events: none; /* 點擊透傳 */
+            
+            /* 強效黑色輪廓線 (確保所有底圖上清晰可見) */
+            text-shadow: 
+                3px 3px 0 #000, -3px -3px 0 #000,  
+                3px -3px 0 #000, -3px 3px 0 #000,
+                0px 3px 0 #000,  0px -3px 0 #000,
+                3px 0px 0 #000, -3px 0px 0 #000,
+                2px 4px 8px rgba(0,0,0,0.8);
+        }
+
+        /* 上方文字位移預設 */
+        #meme-top-text {
+            top: 10%;
+        }
+
+        /* 下方文字位移預設 */
+        #meme-bottom-text {
+            bottom: 10%;
+        }
+
+        /* 咖波超酷下載按鈕 */
+        .btn-download {
+            background: linear-gradient(135deg, var(--capoo-blue) 0%, var(--capoo-blue-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 16px 24px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(44, 181, 232, 0.4);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(44, 181, 232, 0.5);
+            background: linear-gradient(135deg, #32be32 0%, #229922 100%); /* 懸停變萌綠色 */
+        }
+
+        .btn-download:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* 載入中動畫遮罩 */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: var(--border-radius);
+            z-index: 10;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: var(--capoo-blue-dark);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 5px solid var(--capoo-blue-light);
+            border-top: 5px solid var(--capoo-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ==========================================
+           響應式排版 (RWD 手機端優化)
+           ========================================== */
+        @media (max-width: 850px) {
+            .main-container {
+                grid-template-columns: 1fr; /* 手機端改為上下單欄 */
+            }
+
+            .preview-card {
+                order: -1; /* 手機端將預覽區移動至上方，方便邊調邊看 */
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .panel-card, .preview-card {
+                padding: 18px;
+            }
+
+            #meme-image {
+                max-height: 380px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 頁面頂部標題區 -->
+    <header class="header">
+        <h1>
+            <i class="fa-solid fa-cat" style="color: var(--capoo-blue);"></i>
+            咖波迷因產生器
+            <i class="fa-solid fa-paw" style="color: var(--capoo-yellow);"></i>
+        </h1>
+        <p>🐾 輕鬆製作獨一無二的肉肉 / 咖波爆笑迷因！ 🐾</p>
+    </header>
+
+    <!-- 頁面主體 (雙欄/上下佈局) -->
+    <main class="main-container">
+
+        <!-- 左側/下方：控制面板區塊 -->
+        <section class="panel-card">
+            <div class="card-title">
+                <i class="fa-solid fa-sliders"></i> 迷因編輯控制台
+            </div>
+
+            <!-- 1. 圖片上傳區塊 -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-image"></i> 選擇底圖圖片</label>
+                <div class="upload-area" id="drop-zone">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <p>點擊上傳或將圖片拖曳至此</p>
+                    <input type="file" id="image-input" accept="image/*">
+                </div>
+            </div>
+
+            <!-- 2. 上方文字輸入框 -->
+            <div class="form-group">
+                <label for="top-text-input"><i class="fa-solid fa-font"></i> 上方文字 (Top Text)</label>
+                <input type="text" id="top-text-input" placeholder="例如：當你看到肉肉時..." value="當看到肉肉的時候">
+            </div>
+
+            <!-- 3. 下方文字輸入框 -->
+            <div class="form-group">
+                <label for="bottom-text-input"><i class="fa-solid fa-font"></i> 下方文字 (Bottom Text)</label>
+                <input type="text" id="bottom-text-input" placeholder="例如：咖波發出獵食聲音！" value="咖波：喵喵喵喵喵！">
+            </div>
+
+            <!-- 4. 字體大小控制滑桿 -->
+            <div class="form-group">
+                <label for="font-size-slider">
+                    <span><i class="fa-solid fa-text-height"></i> 字體大小</span>
+                    <span class="slider-value" id="font-size-val">36px</span>
+                </label>
+                <input type="range" id="font-size-slider" min="18" max="72" value="36">
+            </div>
+
+            <!-- 5. 上方文字垂直位置滑桿 -->
+            <div class="form-group">
+                <label for="top-pos-slider">
+                    <span><i class="fa-solid fa-arrows-up-down"></i> 上方文字垂直位置</span>
+                    <span class="slider-value" id="top-pos-val">8%</span>
+                </label>
+                <input type="range" id="top-pos-slider" min="2" max="45" value="8">
+            </div>
+
+            <!-- 6. 下方文字垂直位置滑桿 -->
+            <div class="form-group">
+                <label for="bottom-pos-slider">
+                    <span><i class="fa-solid fa-arrows-up-down"></i> 下方文字垂直位置</span>
+                    <span class="slider-value" id="bottom-pos-val">8%</span>
+                </label>
+                <input type="range" id="bottom-pos-slider" min="2" max="45" value="8">
+            </div>
+
+            <!-- 7. 文字顏色選擇器 -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-palette"></i> 文字填充顏色</label>
+                <div class="color-row">
+                    <input type="color" id="text-color-picker" value="#ffffff">
+                    <span style="font-size:0.9rem; color:#666;">預設為純白文字搭強效黑邊</span>
+                </div>
+            </div>
+
+            <!-- 8. 下載按鈕 -->
+            <button class="btn-download" id="download-btn">
+                <i class="fa-solid fa-file-arrow-down"></i> 一鍵下載迷因圖檔
+            </button>
+        </section>
+
+        <!-- 右側/上方：迷因即時預覽區塊 -->
+        <section class="preview-card">
+            <div class="card-title">
+                <i class="fa-solid fa-eye"></i> 即時迷因預覽區
+            </div>
+
+            <!-- 包含截圖區域的包覆框 -->
+            <div class="preview-wrapper">
+                <!-- 核心 HTML2CANVAS 轉圖目標容器 -->
+                <div id="meme-stage">
+                    <!-- 迷因底圖 -->
+                    <img id="meme-image" src="" alt="Capoo Meme Background">
+                    
+                    <!-- 疊加的上方文字 -->
+                    <div id="meme-top-text" class="meme-text">當看到肉肉的時候</div>
+                    
+                    <!-- 疊加的下方文字 -->
+                    <div id="meme-bottom-text" class="meme-text">咖波：喵喵喵喵喵！</div>
+                </div>
+            </div>
+
+            <!-- 轉圖下載時的 Loading 遮罩 -->
+            <div class="loading-overlay" id="loading-overlay">
+                <div class="spinner"></div>
+                <div>咖波正在幫你打包迷因中...</div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        /* ==========================================
+           JavaScript 互動邏輯程式碼
+           ========================================== */
+
+        // 1. 取得頁面上的各個 HTML 元素 (DOM 操作)
+        const imageInput = document.getElementById('image-input');
+        const dropZone = document.getElementById('drop-zone');
+        const memeImage = document.getElementById('meme-image');
+        
+        const topTextInput = document.getElementById('top-text-input');
+        const bottomTextInput = document.getElementById('bottom-text-input');
+        const memeTopText = document.getElementById('meme-top-text');
+        const memeBottomText = document.getElementById('meme-bottom-text');
+        
+        const fontSizeSlider = document.getElementById('font-size-slider');
+        const fontSizeVal = document.getElementById('font-size-val');
+        
+        const topPosSlider = document.getElementById('top-pos-slider');
+        const topPosVal = document.getElementById('top-pos-val');
+        
+        const bottomPosSlider = document.getElementById('bottom-pos-slider');
+        const bottomPosVal = document.getElementById('bottom-pos-val');
+        
+        const textColorPicker = document.getElementById('text-color-picker');
+        
+        const downloadBtn = document.getElementById('download-btn');
+        const memeStage = document.getElementById('meme-stage');
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        // 2. 生成預設的「咖波可愛風格 Placeholder SVG」圖片 (避免網頁初次載入時空白)
+        function loadDefaultCapooImage() {
+            const capooSVG = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="600" height="500" viewBox="0 0 600 500">
+                <rect width="600" height="500" fill="#2cb5e8"/>
+                <circle cx="120" cy="100" r="40" fill="#ffffff" opacity="0.2"/>
+                <circle cx="500" cy="380" r="70" fill="#ffffff" opacity="0.15"/>
+                <!-- Bugcat Body -->
+                <path d="M 150 350 C 120 200, 220 120, 300 120 C 380 120, 480 200, 450 350 Z" fill="#1994c2" stroke="#ffffff" stroke-width="8"/>
+                <path d="M 160 340 C 135 210, 225 135, 300 135 C 375 135, 465 210, 440 340 Z" fill="#2cb5e8"/>
+                <!-- Ears -->
+                <path d="M 190 160 Q 150 80, 230 130 Z" fill="#2cb5e8" stroke="#ffffff" stroke-width="6"/>
+                <path d="M 410 160 Q 450 80, 370 130 Z" fill="#2cb5e8" stroke="#ffffff" stroke-width="6"/>
+                <!-- Eyes -->
+                <ellipse cx="230" cy="220" rx="20" ry="24" fill="#111111"/>
+                <ellipse cx="370" cy="220" rx="20" ry="24" fill="#111111"/>
+                <circle cx="236" cy="212" r="7" fill="#ffffff"/>
+                <circle cx="376" cy="212" r="7" fill="#ffffff"/>
+                <!-- Mouth -->
+                <path d="M 280 260 Q 300 280, 320 260" fill="none" stroke="#111111" stroke-width="6" stroke-linecap="round"/>
+                <!-- Cheeks -->
+                <ellipse cx="200" cy="250" rx="16" ry="10" fill="#ff85a2" opacity="0.8"/>
+                <ellipse cx="400" cy="250" rx="16" ry="10" fill="#ff85a2" opacity="0.8"/>
+                <!-- Cute Paws -->
+                <ellipse cx="240" cy="340" rx="28" ry="18" fill="#ffffff"/>
+                <ellipse cx="360" cy="340" rx="28" ry="18" fill="#ffffff"/>
+            </svg>`;
+            
+            // 將 SVG 轉換為 DataURL 賦值給圖片標籤
+            memeImage.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(capooSVG);
+        }
+
+        // 3. 處理使用者本機圖片上傳 (使用 FileReader 避免 CORS 畫布污染)
+        function handleImageUpload(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('請選擇有效的圖片檔案喔！(JPG, PNG, GIF 等)');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                memeImage.src = e.target.result; // 設定圖檔結果給 img 標籤
+            };
+            reader.readAsDataURL(file); // 讀取為 Base64 格式
+        }
+
+        // 監聽 input[type="file"] 變更事件
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleImageUpload(e.target.files[0]);
+            }
+        });
+
+        // 支援拖曳 (Drag & Drop) 上傳圖片
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleImageUpload(e.dataTransfer.files[0]);
+            }
+        });
+
+        // 4. 即時更新文字與樣式邏輯 (Live Update)
+        
+        // 更新上方文字
+        topTextInput.addEventListener('input', () => {
+            memeTopText.textContent = topTextInput.value;
+        });
+
+        // 更新下方文字
+        bottomTextInput.addEventListener('input', () => {
+            memeBottomText.textContent = bottomTextInput.value;
+        });
+
+        // 更新字體大小
+        fontSizeSlider.addEventListener('input', () => {
+            const val = fontSizeSlider.value;
+            fontSizeVal.textContent = val + 'px';
+            memeTopText.style.fontSize = val + 'px';
+            memeBottomText.style.fontSize = val + 'px';
+        });
+
+        // 更新上方文字垂直位置
+        topPosSlider.addEventListener('input', () => {
+            const val = topPosSlider.value;
+            topPosVal.textContent = val + '%';
+            memeTopText.style.top = val + '%';
+        });
+
+        // 更新下方文字垂直位置
+        bottomPosSlider.addEventListener('input', () => {
+            const val = bottomPosSlider.value;
+            bottomPosVal.textContent = val + '%';
+            memeBottomText.style.bottom = val + '%';
+        });
+
+        // 更新文字填充顏色
+        textColorPicker.addEventListener('input', () => {
+            const color = textColorPicker.value;
+            memeTopText.style.color = color;
+            memeBottomText.style.color = color;
+        });
+
+        // 5. 點擊下載迷因圖檔 (html2canvas)
+        downloadBtn.addEventListener('click', () => {
+            // 顯示載入中動畫遮罩
+            loadingOverlay.style.display = 'flex';
+
+            // 稍微延遲給予 UI 渲染反應時間
+            setTimeout(() => {
+                html2canvas(memeStage, {
+                    scale: 2,           // 提高解析度畫質 (2x)
+                    useCORS: true,      // 允許跨域圖片 (雖然本機已轉 Base64)
+                    backgroundColor: null
+                }).then(canvas => {
+                    // 創建隱藏的 <a> 標籤進行下載
+                    const link = document.createElement('a');
+                    link.download = 'my-capoo-meme.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+
+                    // 隱藏載入遮罩
+                    loadingOverlay.style.display = 'none';
+                }).catch(err => {
+                    console.error('匯出迷因失敗:', err);
+                    alert('匯出圖片時發生錯誤，請重試！');
+                    loadingOverlay.style.display = 'none';
+                });
+            }, 300);
+        });
+
+        // 6. 頁面初始化載入預設值
+        window.onload = function() {
+            loadDefaultCapooImage();
+            // 初始化滑桿大小
+            memeTopText.style.fontSize = fontSizeSlider.value + 'px';
+            memeBottomText.style.fontSize = fontSizeSlider.value + 'px';
+        };
+    </script>
+</body>
+</html>
