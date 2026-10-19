@@ -191,12 +191,12 @@
             </h1>
             
             <p class="text-slate-400 text-xs sm:text-sm mt-2 max-w-md tracking-widest uppercase">
-                網頁程式設計課程闖關地圖 · Level Progress: <span class="text-cyan-400 font-bold">2 / 16</span>
+                網頁程式設計課程闖關地圖 · Level Progress: <span class="text-cyan-400 font-bold">4 / 16</span>
             </p>
 
-            <!-- Progress Bar Container -->
+            <!-- Progress Bar Container (4 / 16 = 25%) -->
             <div class="w-64 sm:w-80 h-2 bg-slate-800 rounded-full mt-4 overflow-hidden border border-slate-700/50 p-0.5">
-                <div class="h-full bg-gradient-to-r from-cyan-500 to-pink-500 rounded-full w-[12.5%] shadow-[0_0_10px_#00f0ff]"></div>
+                <div class="h-full bg-gradient-to-r from-cyan-500 to-pink-500 rounded-full w-[25%] shadow-[0_0_10px_#00f0ff]"></div>
             </div>
         </header>
 
@@ -246,7 +246,7 @@
                     </div>
                 </a>
 
-               <!-- Week 3 (UNLOCKED) -->
+                <!-- Week 3 (UNLOCKED) -->
                 <a href="w3/index.html" class="quest-card-unlocked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40 group">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
@@ -266,28 +266,30 @@
                         <div class="bg-cyan-400 h-full w-full"></div>
                     </div>
                 </a>
-                
-               
 
-                <!-- Week 4 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <!-- Week 4 (UNLOCKED) -->
+                <a href="w4/index.html" class="quest-card-unlocked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40 group">
                     <div class="flex justify-between items-start">
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
                             STAGE 04
                         </span>
-                        <span class="text-sm">🔒</span>
+                        <i class="fa-solid fa-unlock text-cyan-400 text-sm group-hover:scale-125 transition-transform"></i>
                     </div>
                     <div>
-                        <h3 class="text-sm sm:text-base font-bold text-slate-500">
-                            Week 4 - 未解鎖
+                        <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
+                            Week 4 - 悄悄話
                         </h3>
-                        <p class="text-[11px] text-slate-600 mt-1">任務尚未開啟</p>
+                        <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                            <i class="fa-solid fa-play text-[9px] text-cyan-400"></i> 點擊進入關卡
+                        </p>
                     </div>
-                    <div class="w-full bg-slate-800 h-1 rounded-full"></div>
-                </div>
+                    <div class="w-full bg-cyan-500/10 h-1 rounded-full overflow-hidden">
+                        <div class="bg-cyan-400 h-full w-full"></div>
+                    </div>
+                </a>
 
                 <!-- Week 5 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 05
@@ -304,7 +306,7 @@
                 </div>
 
                 <!-- Week 6 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 06
@@ -321,7 +323,7 @@
                 </div>
 
                 <!-- Week 7 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 07
@@ -338,7 +340,7 @@
                 </div>
 
                 <!-- Week 8 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 08
@@ -355,7 +357,7 @@
                 </div>
 
                 <!-- Week 9 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 09
@@ -372,7 +374,7 @@
                 </div>
 
                 <!-- Week 10 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 10
@@ -389,7 +391,7 @@
                 </div>
 
                 <!-- Week 11 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 11
@@ -406,7 +408,7 @@
                 </div>
 
                 <!-- Week 12 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 12
@@ -423,7 +425,7 @@
                 </div>
 
                 <!-- Week 13 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 13
@@ -440,7 +442,7 @@
                 </div>
 
                 <!-- Week 14 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 14
@@ -457,7 +459,7 @@
                 </div>
 
                 <!-- Week 15 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 15
@@ -474,7 +476,7 @@
                 </div>
 
                 <!-- Week 16 (LOCKED) -->
-                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40">
+                <div class="quest-card-locked rounded-xl p-4 sm:p-5 flex flex-col justify-between h-36 sm:h-40" role="button" tabindex="0">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">
                             STAGE 16
@@ -511,15 +513,19 @@
         <i class="fa-solid fa-triangle-exclamation"></i> 該關卡尚未開放解鎖！請完成前面的作業任務。
     </div>
 
-  <script>
+    <script>
         // Attach click listeners to locked cards for feedback animation
+        let toastTimer = null;
         document.querySelectorAll('.quest-card-locked').forEach(card => {
             card.addEventListener('click', () => {
                 const toast = document.getElementById('toast');
+                
+                if (toastTimer) clearTimeout(toastTimer);
+
                 toast.classList.remove('opacity-0');
                 toast.classList.add('opacity-100');
                 
-                setTimeout(() => {
+                toastTimer = setTimeout(() => {
                     toast.classList.remove('opacity-100');
                     toast.classList.add('opacity-0');
                 }, 2000);
