@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雲端心電感應 - Capoo Sky Blue Telepathy</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        capoo: {
+                            light: '#E0F2FE',
+                            primary: '#38BDF8',
+                            dark: '#0284C7',
+                            accent: '#F472B6',
+                            border: '#0369A1',
+                            cardBg: '#BAE6FD'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Comic Sans MS', 'Chalkboard SE', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 3D 翻牌效果樣式 */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        
+        /* 咖波風格卡片陰影與邊框 */
+        .capoo-card {
+            border: 4px solid #0284C7;
+            box-shadow: 4px 6px 0px #0369A1;
+        }
+        .capoo-btn {
+            border: 3px solid #0369A1;
+            box-shadow: 0px 4px 0px #0369A1;
+            transition: all 0.1s ease;
+        }
+        .capoo-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0px 0px 0px #0369A1;
+        }
+        /* 可愛脈動動畫 */
+        @keyframes pulse-gentle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-pulse-gentle {
+            animation: pulse-gentle 2.5s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-sky-100 min-h-screen font-sans text-sky-900 flex flex-col justify-between selection:bg-sky-300">
+
+    <!-- 頂部導覽列 / 狀態列 -->
+    <header class="bg-sky-400 border-b-4 border-sky-700 p-4 text-white shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <!-- 可愛貓貓肉墊圖示 -->
+                <svg class="w-8 h-8 fill-current text-white" viewBox="0 0 24 24">
+                    <path d="M12 2A10 10 0 0 0 2 12A10 10 0 0 0 12 22A10 10 0 0 0 22 12A10 10 0 0 0 12 2M12 4A8 8 0 0 1 20 12A8 8 0 0 1 12 20A8 8 0 0 1 4 12A8 8 0 0 1 12 4M8.5 7.5A1.5 1.5 0 0 0 7 9A1.5 1.5 0 0 0 8.5 10.5A1.5 1.5 0 0 0 10 9A1.5 1.5 0 0 0 8.5 7.5M15.5 7.5A1.5 1.5 0 0 0 14 9A1.5 1.5 0 0 0 15.5 10.5A1.5 1.5 0 0 0 17 9A1.5 1.5 0 0 0 15.5 7.5M12 11.5A2.5 2.5 0 0 0 9.5 14A2.5 2.5 0 0 0 12 16.5A2.5 2.5 0 0 0 14.5 14A2.5 2.5 0 0 0 12 11.5Z"/>
+                </svg>
+                <h1 class="text-2xl font-black tracking-wide drop-shadow-md">雲端心電感應 ✨</h1>
+            </div>
+            <div id="roomInfo" class="hidden flex items-center gap-3">
+                <span class="bg-sky-600 text-white px-3 py-1 rounded-full text-sm font-bold border-2 border-sky-800">
+                    房號: <span id="displayRoomId">-</span>
+                </span>
+                <span class="bg-sky-200 text-sky-800 px-3 py-1 rounded-full text-sm font-bold border-2 border-sky-400">
+                    玩家: <span id="displayPlayerName">-</span>
+                </span>
+                <button onclick="leaveRoom()" class="text-xs bg-sky-200 hover:bg-sky-300 text-sky-800 px-2 py-1 rounded border border-sky-500">
+                    換房
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要內容區域 -->
+    <main class="max-w-4xl w-full mx-auto p-4 flex-grow flex flex-col justify-center items-center">
+
+        <!-- 視圖 1: 登入 / 選擇房間 -->
+        <div id="loginView" class="w-full max-w-md bg-white rounded-3xl p-8 capoo-card text-center my-8 animate-pulse-gentle">
+            <div class="text-6xl mb-4">🐾</div>
+            <h2 class="text-2xl font-extrabold text-sky-600 mb-2">加入心電感應派對</h2>
+            <p class="text-sky-500 text-sm mb-6">輸入玩家名字與房號，測試大家的默契吧！</p>
+            
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-sky-700 font-bold mb-1 text-sm">你的暱稱 / 名字</label>
+                    <input type="text" id="inputPlayerName" placeholder="例如: 狗狗嘎嘎" 
+                        class="w-full px-4 py-3 rounded-2xl border-4 border-sky-300 focus:border-sky-500 focus:outline-none font-bold text-sky-800 text-lg">
+                </div>
+                <div>
+                    <label class="block text-sky-700 font-bold mb-1 text-sm">房間號碼 (Room Code)</label>
+                    <input type="text" id="inputRoomId" placeholder="例如: 888" 
+                        class="w-full px-4 py-3 rounded-2xl border-4 border-sky-300 focus:border-sky-500 focus:outline-none font-bold text-sky-800 text-lg">
+                </div>
+                <button onclick="joinRoom()" 
+                    class="w-full bg-sky-400 hover:bg-sky-500 text-white font-black py-4 rounded-2xl capoo-btn text-xl tracking-wider mt-4">
+                    進入房間 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- 視圖 2: 遊戲主要面板 -->
+        <div id="gameView" class="w-full hidden flex flex-col gap-6">
+
+            <!-- 題目公告區 -->
+            <div class="bg-white rounded-3xl p-6 capoo-card text-center relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 w-16 h-16 bg-sky-200 rounded-full opacity-50"></div>
+                <span class="inline-block bg-sky-400 text-white text-xs font-extrabold px-3 py-1 rounded-full mb-2 border border-sky-600">
+                    CURRENT QUESTION
+                </span>
+                <h3 id="questionText" class="text-2xl sm:text-3xl font-black text-sky-700 min-h-[40px] flex items-center justify-center">
+                    等待房主出題中... 💤
+                </h3>
+            </div>
+
+            <!-- 玩家填答輸入區 (僅在 playing 狀態顯示) -->
+            <div id="answerInputSection" class="bg-white rounded-3xl p-6 capoo-card text-center hidden">
+                <h4 class="text-lg font-bold text-sky-600 mb-3">請寫下你的默契解答：</h4>
+                <div class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+                    <input type="text" id="inputMyAnswer" placeholder="輸入答案..." 
+                        class="flex-1 px-4 py-3 rounded-2xl border-4 border-sky-300 focus:border-sky-500 focus:outline-none font-bold text-sky-800 text-lg">
+                    <button onclick="submitAnswer()" id="btnSubmitAnswer" 
+                        class="bg-pink-400 hover:bg-pink-500 text-white font-extrabold px-6 py-3 rounded-2xl capoo-btn whitespace-nowrap text-lg">
+                        送出答案 💌
+                    </button>
+                </div>
+                <p id="submittedNotice" class="text-xs text-sky-500 mt-2 font-bold hidden">
+                    ✅ 答案已送出！可以重複送出修改答案，直到開牌。
+                </p>
+            </div>
+
+            <!-- 狀態提醒卡 -->
+            <div id="statusNotice" class="bg-sky-200 border-2 border-sky-400 rounded-2xl p-4 text-center font-bold text-sky-800 text-sm">
+                🔄 正在讀取房間狀態...
+            </div>
+
+            <!-- 玩家卡片列表 (3D 翻牌顯示區) -->
+            <div>
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h4 class="text-xl font-black text-sky-800 flex items-center gap-2">
+                        <span>👥 玩家答題狀態</span>
+                        <span id="playerCountBadge" class="bg-sky-300 text-sky-900 text-xs px-2.5 py-0.5 rounded-full font-bold">0 人</span>
+                    </h4>
+                    <span class="text-xs font-bold text-sky-600">同步自動輪詢中 ⚡</span>
+                </div>
+
+                <div id="cardsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <!-- 玩家卡片將動態注入於此 -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 底部隱藏控制列與隱藏房主開關 -->
+    <footer class="bg-sky-300 border-t-4 border-sky-500 p-3 text-center text-xs text-sky-800 font-bold relative">
+        <p>雲端心電感應遊戲 &copy; 咖波天藍風體驗版</p>
+        
+        <!-- 隱藏房主控制按鈕 (角落偷偷踩肉墊) -->
+        <button onclick="toggleHostPanel()" title="隱藏房主控制台"
+            class="absolute right-3 bottom-2 bg-sky-400 hover:bg-sky-500 text-white p-2 rounded-full border-2 border-sky-600 shadow transition-transform active:scale-95">
+            👑 <span class="sr-only">房主選單</span>
+        </button>
+    </footer>
+
+    <!-- 房主控制台 Modal (隱藏式彈窗) -->
+    <div id="hostModal" class="fixed inset-0 bg-sky-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full capoo-card relative">
+            <button onclick="toggleHostPanel()" class="absolute right-4 top-4 text-sky-500 font-bold text-xl hover:text-sky-700">✖</button>
+            
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-2xl">👑</span>
+                <h3 class="text-xl font-black text-sky-700">隱藏房主控制台</h3>
+            </div>
+
+            <div class="space-y-4">
+                <!-- 房主出題區 -->
+                <div class="bg-sky-50 p-4 rounded-2xl border-2 border-sky-200">
+                    <label class="block text-sky-800 font-bold mb-1 text-sm">步驟 1: 設定新題目</label>
+                    <input type="text" id="hostQuestionInput" placeholder="例如: 提到紅色水果會想到什麼？" 
+                        class="w-full px-3 py-2 rounded-xl border-2 border-sky-300 focus:outline-none text-sky-800 font-bold mb-2 text-sm">
+                    <button onclick="hostSetQuestion()" class="w-full bg-sky-400 hover:bg-sky-500 text-white font-bold py-2 rounded-xl capoo-btn text-sm">
+                        發布題目 (開始答題) 📢
+                    </button>
+                </div>
+
+                <!-- 房主開牌區 -->
+                <div class="bg-pink-50 p-4 rounded-2xl border-2 border-pink-200">
+                    <label class="block text-pink-800 font-bold mb-1 text-sm">步驟 2: 全員開牌 (3D 翻牌)</label>
+                    <p class="text-xs text-pink-600 mb-2">按下開牌後，所有人的畫面將同步觸發翻牌動畫！</p>
+                    <button onclick="hostReveal()" class="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-2 rounded-xl capoo-btn text-sm">
+                        開牌！ Reveal 🎉
+                    </button>
+                </div>
+
+                <!-- 房主重置區 -->
+                <div class="bg-gray-50 p-4 rounded-2xl border-2 border-gray-200">
+                    <label class="block text-gray-700 font-bold mb-1 text-sm">步驟 3: 重置遊戲</label>
+                    <button onclick="hostReset()" class="w-full bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 rounded-xl capoo-btn text-sm">
+                        清空房間與重置 🔄
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 邏輯 -->
+    <script>
+        // 設定 Backend GAS API URL 與工作表名稱
+        const SHEET_NAME = 'TelepathyData';
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxddY_j_HUZ0KKyKfQIlh2Sxo8UaCHpCbIZf084XYTBvVqpUNwCNsbH-hHqvNI_qddfCA/exec";
+
+        // 全域狀態
+        let currentRoomId = "";
+        let currentAnswers = {};
+        let currentStatus = "setup"; // setup | playing | revealed
+        let pollingTimer = null;
+        let isHostModalOpen = false;
+
+        // 頁面載入時檢查 URL 參數是否包含 room
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomParam = urlParams.get('room');
+            if (roomParam) {
+                document.getElementById('inputRoomId').value = roomParam;
+            }
+        });
+
+        // 加入房間
+        function joinRoom() {
+            const nameInput = document.getElementById('inputPlayerName').value.trim();
+            const roomInput = document.getElementById('inputRoomId').value.trim();
+
+            if (!nameInput || !roomInput) {
+                alert('請輸入玩家姓名與房間號碼唷！🐾');
+                return;
+            }
+
+            localStorage.setItem('telepathy_player_name', nameInput);
+            currentRoomId = roomInput;
+
+            // 更新 UI 顯示
+            document.getElementById('displayRoomId').innerText = currentRoomId;
+            document.getElementById('displayPlayerName').innerText = nameInput;
+
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('gameView').classList.remove('hidden');
+            document.getElementById('roomInfo').classList.remove('hidden');
+
+            // 啟動 2 秒輪詢
+            fetchGameState();
+            if (pollingTimer) clearInterval(pollingTimer);
+            pollingTimer = setInterval(fetchGameState, 2000);
+        }
+
+        // 離開/切換房間
+        function leaveRoom() {
+            if (pollingTimer) clearInterval(pollingTimer);
+            currentRoomId = "";
+            document.getElementById('gameView').classList.add('hidden');
+            document.getElementById('roomInfo').classList.add('hidden');
+            document.getElementById('loginView').classList.remove('hidden');
+        }
+
+        // GET: 抓取最新遊戲狀態
+        async function fetchGameState() {
+            if (!currentRoomId) return;
+
+            try {
+                const response = await fetch(`${GAS_API_URL}?room=${encodeURIComponent(currentRoomId)}`);
+                if (!response.ok) throw new Error('網路回應不正常');
+                
+                const data = await response.json();
+                
+                // 更新全域狀態
+                currentStatus = data.status || 'setup';
+                const question = data.question || '';
+                currentAnswers = data.answers || {};
+
+                updateUI(currentStatus, question, currentAnswers);
+            } catch (err) {
+                console.error("抓取遊戲狀態失敗:", err);
+                document.getElementById('statusNotice').innerText = "⚠️ 與連線 GAS 發生小狀況，正在重試中...";
+            }
+        }
+
+        // 更新 UI 視覺
+        function updateUI(status, question, answers) {
+            const questionEl = document.getElementById('questionText');
+            const answerInputSec = document.getElementById('answerInputSection');
+            const statusNotice = document.getElementById('statusNotice');
+
+            // 更新題目與輸入介面
+            if (status === 'setup') {
+                questionEl.innerText = "⏳ 房主正在準備題目中，請稍候...";
+                answerInputSec.classList.add('hidden');
+                statusNotice.innerText = "💤 遊戲準備中";
+            } else if (status === 'playing') {
+                questionEl.innerText = question || "（目前題目為空）";
+                answerInputSec.classList.remove('hidden');
+                statusNotice.innerText = "✏️ 大家正在作答中... 填答完畢等待房主開牌！";
+            } else if (status === 'revealed') {
+                questionEl.innerText = question || "（開牌階段）";
+                answerInputSec.classList.add('hidden');
+                statusNotice.innerText = "🎉 揭曉答案！大家有心電感應嗎？";
+            }
+
+            // 更新卡片列表與 3D 翻牌狀態
+            renderCards(answers, status === 'revealed');
+        }
+
+        // 渲染玩家 3D 卡片
+        function renderCards(answers, isRevealed) {
+            const grid = document.getElementById('cardsGrid');
+            const playerNames = Object.keys(answers);
+            document.getElementById('playerCountBadge').innerText = `${playerNames.length} 人已填答`;
+
+            if (playerNames.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-8 text-sky-400 font-bold border-2 border-dashed border-sky-300 rounded-2xl">
+                        🐾 還沒有人送出答案唷，快成為第一個吧！
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = playerNames.map(name => {
+                const answerText = answers[name];
+                return `
+                    <div class="perspective-1000 h-36">
+                        <div class="relative w-full h-full transform-style-3d ${isRevealed ? 'rotate-y-180' : ''}">
+                            <!-- 卡片背面 (未翻牌) -->
+                            <div class="absolute inset-0 bg-sky-400 rounded-2xl capoo-card flex flex-col items-center justify-center text-white backface-hidden p-2">
+                                <div class="text-3xl mb-1">🐾</div>
+                                <div class="font-black text-base truncate max-w-full px-2">${escapeHtml(name)}</div>
+                                <div class="text-xs bg-sky-500/80 px-2 py-0.5 rounded-full mt-1">已卡位填答</div>
+                            </div>
+
+                            <!-- 卡片正面 (開牌結果) -->
+                            <div class="absolute inset-0 bg-white rounded-2xl capoo-card flex flex-col items-center justify-center text-sky-900 backface-hidden rotate-y-180 p-2">
+                                <div class="text-xs text-sky-400 font-bold mb-1">${escapeHtml(name)} 的答案</div>
+                                <div class="font-black text-xl text-sky-700 break-all line-clamp-2 text-center px-1">
+                                    ${escapeHtml(answerText)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // POST: 送出答案 (玩家)
+        async function submitAnswer() {
+            const answerInput = document.getElementById('inputMyAnswer');
+            const answer = answerInput.value.trim();
+            const playerName = localStorage.getItem('telepathy_player_name');
+
+            if (!answer) {
+                alert('請先輸入答案再送出喔！');
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitAnswer');
+            btn.disabled = true;
+            btn.innerText = "傳送中...";
+
+            try {
+                await postToGas({
+                    room: currentRoomId,
+                    action: "submit_answer",
+                    playerName: playerName,
+                    answer: answer
+                });
+                
+                document.getElementById('submittedNotice').classList.remove('hidden');
+                fetchGameState(); // 立即重新整理
+            } catch (err) {
+                alert('送出答案失敗，請檢查網路連線。');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "送出答案 💌";
+            }
+        }
+
+        // 房主操作 Modal 切換
+        function toggleHostPanel() {
+            const modal = document.getElementById('hostModal');
+            isHostModalOpen = !isHostModalOpen;
+            if (isHostModalOpen) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // POST: 房主出題
+        async function hostSetQuestion() {
+            const q = document.getElementById('hostQuestionInput').value.trim();
+            if (!q) {
+                alert('請輸入題目內容！');
+                return;
+            }
+
+            try {
+                await postToGas({
+                    room: currentRoomId,
+                    action: "set_question",
+                    question: q
+                });
+                document.getElementById('hostQuestionInput').value = "";
+                toggleHostPanel();
+                fetchGameState();
+            } catch (err) {
+                alert('設定題目失敗');
+            }
+        }
+
+        // POST: 房主開牌
+        async function hostReveal() {
+            try {
+                await postToGas({
+                    room: currentRoomId,
+                    action: "reveal"
+                });
+                toggleHostPanel();
+                fetchGameState();
+            } catch (err) {
+                alert('觸發開牌失敗');
+            }
+        }
+
+        // POST: 房主重置
+        async function hostReset() {
+            if (!confirm('確定要清空房間並重新開始嗎？')) return;
+            try {
+                await postToGas({
+                    room: currentRoomId,
+                    action: "reset"
+                });
+                toggleHostPanel();
+                fetchGameState();
+            } catch (err) {
+                alert('重置房間失敗');
+            }
+        }
+
+        // 通用 POST Fetch 工具函式
+        async function postToGas(payload) {
+            const res = await fetch(GAS_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8' // GAS 建議跨網域 request 規範
+                },
+                body: JSON.stringify(payload)
+            });
+            return res.json();
+        }
+
+        // HTML 轉義字元防護
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
